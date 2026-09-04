@@ -43,7 +43,7 @@ class Rating(models.Model):
         return f"{self.user.username} - {self.product.name} - {self.rating}"
 
 class Cart(models.Model):
-    user = models.OneToOneField(on_delete= models.CASCADE)
+    user = models.OneToOneField(User,on_delete= models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -58,6 +58,7 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} X {self.product.name}"
+    
     #Item price 
     def get_cost(self):
         return self.quantity * self.product.price
