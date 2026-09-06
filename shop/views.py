@@ -18,3 +18,15 @@ def login_view(request):
             messages.error(request, "Invalid username or password")
     return render(request, '')
 
+def register_view(request):
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
+
+        if form.is_valid():
+            user = form.save()
+            login(request,user)
+            messages.success(request, "Registration Successfull")
+            redirect()
+    else:
+        form = RegistrationForm()
+    return render(request,'', {'form' : form})
