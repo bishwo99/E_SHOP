@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
+from .forms import RegistrationForm,RatingForm,CheckoutForm
+from . import models
 
 # Create your views here.
 
@@ -34,3 +36,11 @@ def register_view(request):
 def logout_view(request):
     logout(request)
     redirect('')
+
+# Creating Homepage
+
+def home(request):
+    featured_product = models.Product.objects.filter(available = True).order_by('-created_at') [:8] # Descending Order
+    categories = models.Category.objects.all()
+    return render(request, '', {'featured_product': featured_product, 'categories': categories})
+
