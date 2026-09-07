@@ -30,3 +30,7 @@ def register_view(request):
     else:
         form = RegistrationForm()
     return render(request,'', {'form' : form})
+
+def logout_view(request):
+    logout(request)
+    redirect('')
