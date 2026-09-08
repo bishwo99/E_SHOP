@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
 from .forms import RegistrationForm,RatingForm,CheckoutForm
 from . import models
+from django.db.models import Max, Min, Avg, Q
+
 
 # Create your views here.
 
@@ -44,3 +46,39 @@ def home(request):
     categories = models.Category.objects.all()
     return render(request, '', {'featured_product': featured_product, 'categories': categories})
 
+def product_list(request, category_slug = None):
+    category = None
+    categories = models.Category.objects.all()
+    products = models.Product.objects.all()
+
+    if category_slug:
+        category = get_object_or_404(models.Category, category_slug)
+        products = products.filter(category = category)
+
+    min_price = products.aggregate(Min('price'))['price__min']
+    max_price = products.aggregate(Max('price'))['price__max']
+
+    if request.GET.get('min_price'):
+        products = products.filter(price__gte = request.GET.get('min_price'))
+    if request.GET.get('max_price'):
+        products = products.filter(price__lte = request.GET.get('max_price'))
+
+    if request.GET.get('rating'):
+        products = products.annotate(avg_rating = Avg('ratings__rating')).filter(avg_rating = request.GET.get('rating'))
+
+    if request.GET.get('search'):
+        query = request.GET.get('search')
+        products = products.filter(
+            Q(name__icontains = query)|
+            Q(description__icontains = query)|
+            Q(category__name__icontains = query)  
+        )
+
+    return(request,'',{
+        'category' : category,
+        'categories' : categories,
+        'products' : products,
+        'min_price' : min_price,
+        'max_price' : max_price
+
+    })   
