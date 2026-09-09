@@ -79,6 +79,5 @@ def product_list(request, category_slug = None):  # Slug means, converting eleme
         'categories' : categories,
         'products' : products,
         'min_price' : min_price,
-        'max_price' : max_price
-
+        'max_price' : max_price,
     })   
