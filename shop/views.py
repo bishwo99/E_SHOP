@@ -46,7 +46,7 @@ def home(request):
     categories = models.Category.objects.all()
     return render(request, '', {'featured_product': featured_product, 'categories': categories})
 
-def product_list(request, category_slug = None):
+def product_list(request, category_slug = None):  # Slug means, converting element info within link 
     category = None
     categories = models.Category.objects.all()
     products = models.Product.objects.all()
@@ -55,19 +55,19 @@ def product_list(request, category_slug = None):
         category = get_object_or_404(models.Category, category_slug)
         products = products.filter(category = category)
 
-    min_price = products.aggregate(Min('price'))['price__min']
+    min_price = products.aggregate(Min('price'))['price__min']  
     max_price = products.aggregate(Max('price'))['price__max']
 
     if request.GET.get('min_price'):
-        products = products.filter(price__gte = request.GET.get('min_price'))
+        products = products.filter(price__gte = request.GET.get('min_price'))  # Use filtering function
     if request.GET.get('max_price'):
         products = products.filter(price__lte = request.GET.get('max_price'))
 
     if request.GET.get('rating'):
-        products = products.annotate(avg_rating = Avg('ratings__rating')).filter(avg_rating = request.GET.get('rating'))
+        products = products.annotate(avg_rating = Avg('ratings__rating')).filter(avg_rating = request.GET.get('rating')) #annotate means creating another variable corresponding another object with present variable
 
-    if request.GET.get('search'):
-        query = request.GET.get('search')
+    if request.GET.get('search'):   
+        query = request.GET.get('search')   #Search queries
         products = products.filter(
             Q(name__icontains = query)|
             Q(description__icontains = query)|
