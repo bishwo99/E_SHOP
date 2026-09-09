@@ -81,3 +81,9 @@ def product_list(request, category_slug = None):  # Slug means, converting eleme
         'min_price' : min_price,
         'max_price' : max_price,
     })   
+
+def product_list(request,slug):
+    product = get_object_or_404(models.Product, slug = slug, available = True)
+    related_products = models.Product.objects.filter(category = product.category).exclude(id = product.id)
+
+    user_rating = None
