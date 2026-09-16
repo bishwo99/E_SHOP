@@ -100,3 +100,43 @@ def product_list(request,slug):
         'rating_form' : rating_form,
         'user_rating' : user_rating,
     })
+
+    # Rate Product
+    # Loged in user can rate the product, Is the user purchased the product or not
+
+    def rate_product(request, product_id):
+        product = get_object_or_404(models.Product, id = product_id)
+        ordered_items = models.OrderItem.objects.filter(
+            order__user = request.user,
+            product = product,
+            order__paid = True
+        )
+        if not ordered_items.exists():
+            messagges.error(request, 'You can only rate products you have purchased.')
+            return redirect('')
+        try:
+            rating = models.Rating.objects.get(product = product, user = request.user)
+        except models.Rating.DoesNotExist:
+            rating = None
+
+        # Jodi rating age diye thake tahole form e age theke rating show korbe, sekhetre instance = user rating thakbe
+
+        #  jodi rating na diye thake tahole instance = None thakbe, tahole form e kono rating show korbe na
+
+        if request.method == 'POST':
+            form = RatingForm(request.POST, instance = rating)
+            if form.is_valid():
+                rating = form.save(commit = False)
+                rating.product = product
+                rating.user = request.user
+                rating.save()
+                return redirect('')
+            else:
+                form = RatingForm(instance = rating)
+        return render(request,'',{
+            'form' : form,
+            'product' : product,
+            
+        })
+
+
