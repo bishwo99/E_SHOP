@@ -87,3 +87,16 @@ def product_list(request,slug):
     related_products = models.Product.objects.filter(category = product.category).exclude(id = product.id)
 
     user_rating = None
+    if request.user.is_authenticate:
+        try:
+            user_rating = models.Rating.objects.get(product=product, user = request.user)
+        except models.Rating.DoesNotExist:
+            pass       
+    rating_form = RatingForm(instance = user_rating)
+
+    return render(request,'',{
+        'product' : product,
+        'related_products' : related_products,
+        'rating_form' : rating_form,
+        'user_rating' : user_rating,
+    })
