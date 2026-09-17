@@ -1,3 +1,5 @@
+
+
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
@@ -112,7 +114,7 @@ def rate_product(request, product_id):
         order__paid = True
         )
     if not ordered_items.exists():
-        messagges.error(request, 'You can only rate products you have purchased.')
+        messages.error(request, 'You can only rate products you have purchased.')
         return redirect('')
     try:
         rating = models.Rating.objects.get(product = product, user = request.user)
@@ -142,17 +144,29 @@ def rate_product(request, product_id):
     })
 
 def cart_add(request, product_id):
+    product = get_object_or_404(models.Product, id = product_id)
     # User er card ache kina
+    # Jodi cart na thake tahole sheta identify kora
 
     try: 
         cart = models.Cart.objects.get(user = request.user)
 
-    # Jodi cart na thake tahole sheta identify kora
-
     # Jodi na thake tahole cart ekta banabo.
+    except models.Cart.DoesNotExist:
+        cart = models.Cart.objects.create(user = request.user)
+    # Cart e item add korbo
 
+    # Case 1: Cart e item ache
+
+    try:
+        cart_item = models.CartItem.objects.get(cart = cart, product = product)
+        cart_item.quantity += 1
+        cart_item.save()
+    except models.CartItem.DoesNotExist:
+        cart_item = models.CartItem.objects.create(cart = cart, product = product, quantity = 1)
+        messages.success(request, f"{product.name} has been added to your cart")
+        return redirect(request,'')
+
+
+    # Case 2: Cart e item nai
     
-
-
-
-
