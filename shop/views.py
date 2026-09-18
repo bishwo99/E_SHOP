@@ -162,11 +162,12 @@ def cart_add(request, product_id):
         cart_item = models.CartItem.objects.get(cart = cart, product = product)
         cart_item.quantity += 1
         cart_item.save()
+    # Case 2: Cart e item nai
     except models.CartItem.DoesNotExist:
         cart_item = models.CartItem.objects.create(cart = cart, product = product, quantity = 1)
-        messages.success(request, f"{product.name} has been added to your cart")
-        return redirect(request,'')
+    messages.success(request, f"{product.name} has been added to your cart")
+    return redirect(request,'')
 
 
-    # Case 2: Cart e item nai
+    
     
