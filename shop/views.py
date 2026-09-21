@@ -289,6 +289,10 @@ def payment_success(request, order_id):
             product.stock = 0
         product.save()
 
+    # Confirmation message
+    messages.success(request, 'Payment Successful!')
+    return render(request,'', {'order' : order})
+
 
 
 
