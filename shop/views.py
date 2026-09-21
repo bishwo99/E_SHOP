@@ -194,5 +194,7 @@ def cart_update(request,product_id):
     else:
         cart_item.quantity = quantity
         cart_item.save()
-        
+        messages.success(request, "Cart update succsessfully!")
+    return redirect()
+
 
