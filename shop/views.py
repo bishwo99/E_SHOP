@@ -216,4 +216,13 @@ def cart_remove(request,product_id):
     messages.success(request, f"{product.name} has been deleted from your cart!!")
     return redirect("")
 
+def cart_details(request, product_id):
+    # Case01: User er cart nai
+    # Case02: User er cart ache
 
+    try:
+        cart = models.Cart.objects.get(user = request.user)
+    except models.Cart.DoesNotExist:
+        cart = models.Cart.objects.create(user = request.user)
+
+    return render(request,'', {'cart': cart})
