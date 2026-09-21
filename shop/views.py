@@ -198,3 +198,14 @@ def cart_update(request,product_id):
     return redirect()
 
 
+def cart_remove(request,product_id):
+
+    cart = get_object_or_404(models.Cart, user = request.user)
+    product = get_object_or_404(models.Product, product_id)
+    cart_item = get_object_or_404(models.CartItem, cart = cart, product = product)
+
+    cart_item.delete()
+    messages.success(request, f"{product.name} has been deleted from your cart!!")
+    return redirect("")
+
+
