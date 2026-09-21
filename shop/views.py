@@ -168,6 +168,31 @@ def cart_add(request, product_id):
     messages.success(request, f"{product.name} has been added to your cart")
     return redirect(request,'')
 
+# Cart Update
+# Cart item quantity increase/decrease korte parbo
 
-    
-    
+def cart_update(request,product_id):
+    # Cart Konta
+    # Cart Item konta
+    # Product gulo Cart Item e or Stock e available ache kina
+    cart = get_object_or_404(models.Cart, user = request.user)
+    product = get_object_or_404(models.Product, product_id)
+    cart_item = get_object_or_404(models.CartItem, cart = cart, product = product)
+
+    quantity = int(request.POST.get('quantity',1))
+
+    # There are important case
+
+    # Cart item stock e ache 20 ta but user order korte chacche 40 ta
+
+    # Cart item update korte korte jokhon quantity 0 te chole ashbe tokhon actually user oi item ta delete korte chacche
+
+    if quantity <= 0:
+        cart_item.delete()
+        messages.success(request, f"{product.name} has been deleted successfully from your cart!")
+
+    else:
+        cart_item.quantity = quantity
+        cart_item.save()
+        
+
