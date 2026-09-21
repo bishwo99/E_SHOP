@@ -1,11 +1,10 @@
-
-
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
 from .forms import RegistrationForm,RatingForm,CheckoutForm
 from . import models
 from django.db.models import Max, Min, Avg, Q
+from . import forms
 
 
 # Create your views here.
@@ -241,6 +240,37 @@ def checkout(request):
         return redirect(request,'')
 
     #Checkout Form ta fillup korbe
+    if request.method == 'POST':
+        form = forms.CheckoutForm(request.POST)
+        if form.is_valid():
+            order = form.save(commit=False) # object create korbe but database e jabena
+            order.user = request.user
+            order.save() # order kora hoye geche
+
+        for item in cart.item.all():
+            models.OrderItem.create(
+                order = order,
+                product = item.product,
+                quantity = item.quantity,
+                price = item.product.price,
+            )
+            #order kora done
+
+        cart.item.all().delete() # After completing order those item, cart will be removed
+        request.session['order_item'] = order.id
+        return redirect('')
+    else:
+        form = forms.CheckoutForm()
+    return render(request,'',{
+        'cart' : cart,
+        'form' : form,
+    })
+
+
+
+
+
+
 
         
 
