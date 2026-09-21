@@ -294,6 +294,15 @@ def payment_success(request, order_id):
     return render(request,'', {'order' : order})
 
 
+def payment_fail(request,order_id):
+    order = get_object_or_404(models.Order, id = order_id, user = request.user)
+    order.status = 'canceled'
+    order.save()
+
+    messages.warning(request, 'Your Payment is cancelled!')
+    return redirect('')
+
+
 
 
 
