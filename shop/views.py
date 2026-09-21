@@ -266,6 +266,30 @@ def checkout(request):
         'form' : form,
     })
 
+# Payment feature
+
+#Payment Success
+#Payment Fail
+#Payment Cancel
+
+def payment_success(request, order_id):
+    order= get_object_or_404(models.Order, user = request.user, id = order_id)
+    order.paid = True
+    order.status = 'Processing'
+    order.transaction_id = order_id
+    order.save()
+
+    order_items = order.order_items.all()
+    for item in order_items:
+        product = item.prodcut
+        product.stock -= item.quantity
+
+        #It means, product ache 20 ta and jodi product 40 ta order kora hoye thake tokhon stock quantity negative hoyte parena ejonne 0 kore dibo
+        if product.stock <0:
+            product.stock = 0
+        product.save()
+
+
 
 
 
