@@ -143,6 +143,14 @@ def rate_product(request, product_id):
             
     })
 
+# Everything about Cart - Features
+# cart_detail - Temporar order
+# Cart item add - ok
+# cart item remove - ok
+# cart item update - ok
+# checkout
+
+
 def cart_add(request, product_id):
     product = get_object_or_404(models.Product, id = product_id)
     # User er card ache kina
