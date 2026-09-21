@@ -226,3 +226,21 @@ def cart_details(request, product_id):
         cart = models.Cart.objects.create(user = request.user)
 
     return render(request,'', {'cart': cart})
+
+
+# For checkout
+# Cart er datagulo niye ashbo
+# Cart empty thakle message dibo
+def checkout(request):
+    cart = models.Cart.objects.get(user = request.user)
+    try:
+        if not cart.items.exists():
+            messages.warning(request,'Your cart is empty.')
+    except models.Cart.DoesNotExist():
+        messages.warning(request,'Your cart is empty.')
+        return redirect(request,'')
+
+    #Checkout Form ta fillup korbe
+
+        
+
