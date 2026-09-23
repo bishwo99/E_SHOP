@@ -302,7 +302,10 @@ def payment_fail(request,order_id):
     messages.warning(request, 'Your Payment is cancelled!')
     return redirect('')
 
-
+def payment_cancel(request, order_id):
+    order = get_object_or_404(models.Order, id = order_id , user = request.user)
+    order.status = 'canceled'
+    order.save()
 
 
 
