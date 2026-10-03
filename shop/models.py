@@ -90,6 +90,8 @@ class Order(models.Model):
         return f"Order #{self.id}"
     def get_total_cost(self):
             return sum(item.get_cost() for item in self.order_items.all())
+    def get_total_items(self):
+        return sum( item.quantity for item in self.items.all())
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete= models.CASCADE, related_name='order_items')
