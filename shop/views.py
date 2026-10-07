@@ -19,10 +19,10 @@ def login_view(request):
 
         if user is not None:
             login(request,user)
-            redirect('')
+            redirect('home')
         else:
             messages.error(request, "Invalid username or password")
-    return render(request, '')
+    return render(request, 'shop/login.html')
 
 def register_view(request):
     if request.method == 'POST':
@@ -32,21 +32,21 @@ def register_view(request):
             user = form.save()
             login(request,user)
             messages.success(request, "Registration Successfull")
-            redirect()
+            redirect('home')
     else:
         form = RegistrationForm()
-    return render(request,'', {'form' : form})
+    return render(request,'shop/register.html', {'form' : form})
 
 def logout_view(request):
     logout(request)
-    redirect('')
+    redirect('login')
 
 # Creating Homepage
 
 def home(request):
     featured_product = models.Product.objects.filter(available = True).order_by('-created_at') [:8] # Descending Order
     categories = models.Category.objects.all()
-    return render(request, '', {'featured_product': featured_product, 'categories': categories})
+    return render(request, 'shop/home.html', {'featured_product': featured_product, 'categories': categories})
 
 def product_list(request, category_slug = None):  # Slug means, converting element info within link 
     category = None
@@ -76,7 +76,7 @@ def product_list(request, category_slug = None):  # Slug means, converting eleme
             Q(category__name__icontains = query)  
         )
 
-    return(request,'',{
+    return render(request,'shop/product_list.html',{
         'category' : category,
         'categories' : categories,
         'products' : products,
@@ -84,7 +84,7 @@ def product_list(request, category_slug = None):  # Slug means, converting eleme
         'max_price' : max_price,
     })   
 
-def product_list(request,slug):
+def product_detail(request,slug):
     product = get_object_or_404(models.Product, slug = slug, available = True)
     related_products = models.Product.objects.filter(category = product.category).exclude(id = product.id)
 
@@ -96,7 +96,7 @@ def product_list(request,slug):
             pass       
     rating_form = RatingForm(instance = user_rating)
 
-    return render(request,'',{
+    return render(request,'shop/product_detail.html',{
         'product' : product,
         'related_products' : related_products,
         'rating_form' : rating_form,
@@ -115,7 +115,7 @@ def rate_product(request, product_id):
         )
     if not ordered_items.exists():
         messages.error(request, 'You can only rate products you have purchased.')
-        return redirect('')
+        return redirect('product_detail', slug = product.slug)
     try:
         rating = models.Rating.objects.get(product = product, user = request.user)
     except models.Rating.DoesNotExist:
@@ -134,10 +134,10 @@ def rate_product(request, product_id):
             rating.product = product
             rating.user = request.user
             rating.save()
-            return redirect('')
+            return redirect('product_detail', slug = product.slug)
         else:
             form = RatingForm(instance = rating)
-    return render(request,'',{
+    return render(request,'shop/rate_product.html',{
         'form' : form,
         'product' : product,
             
@@ -148,7 +148,19 @@ def rate_product(request, product_id):
 # Cart item add - ok
 # cart item remove - ok
 # cart item update - ok
-# checkout
+# checkout - ok
+
+
+def cart_detail(request):
+    # Case01: User er cart nai
+    # Case02: User er cart ache
+
+    try:
+        cart = models.Cart.objects.get(user = request.user)
+    except models.Cart.DoesNotExist:
+        cart = models.Cart.objects.create(user = request.user)
+
+    return render(request,'shop/cart.html', {'cart': cart})
 
 
 def cart_add(request, product_id):
@@ -174,7 +186,7 @@ def cart_add(request, product_id):
     except models.CartItem.DoesNotExist:
         cart_item = models.CartItem.objects.create(cart = cart, product = product, quantity = 1)
     messages.success(request, f"{product.name} has been added to your cart")
-    return redirect(request,'')
+    return redirect(request,'product_detail', slug = product.slug)
 
 # Cart Update
 # Cart item quantity increase/decrease korte parbo
@@ -203,7 +215,7 @@ def cart_update(request,product_id):
         cart_item.quantity = quantity
         cart_item.save()
         messages.success(request, "Cart update succsessfully!")
-    return redirect()
+    return redirect('cart_detail')
 
 
 def cart_remove(request,product_id):
@@ -214,18 +226,8 @@ def cart_remove(request,product_id):
 
     cart_item.delete()
     messages.success(request, f"{product.name} has been deleted from your cart!!")
-    return redirect("")
+    return redirect("cart_detail")
 
-def cart_details(request, product_id):
-    # Case01: User er cart nai
-    # Case02: User er cart ache
-
-    try:
-        cart = models.Cart.objects.get(user = request.user)
-    except models.Cart.DoesNotExist:
-        cart = models.Cart.objects.create(user = request.user)
-
-    return render(request,'', {'cart': cart})
 
 
 # For checkout
@@ -238,7 +240,7 @@ def checkout(request):
             messages.warning(request,'Your cart is empty.')
     except models.Cart.DoesNotExist():
         messages.warning(request,'Your cart is empty.')
-        return redirect(request,'')
+        return redirect(request,'cart_detail')
 
     #Checkout Form ta fillup korbe
     if request.method == 'POST':
@@ -259,10 +261,10 @@ def checkout(request):
 
         cart.item.all().delete() # After completing order those item, cart will be removed
         request.session['order_item'] = order.id
-        return redirect('')
+        return redirect('payment_process')
     else:
         form = forms.CheckoutForm()
-    return render(request,'',{
+    return render(request,'shop/checkout.html',{
         'cart' : cart,
         'form' : form,
     })
@@ -277,14 +279,15 @@ def payment_process(request):
     order_id = request.session.get('order_id')
 
     if not order_id:
-        return redirect('')
+        return redirect('home')
 
     order = get_object_or_404(models.Order, id = order_id)
     payment_data = sslcommerz.generate_sslcommerz_payment(request, order)
     if payment_data['status'] == 'SUCCESS':
-        return redirect('')
+        return redirect(payment_data['GatewayPageURL'])
     else:
         messages.error(request,'Payment gateway error.')
+        return redirect('checkout')
 
 def payment_success(request, order_id):
     order= get_object_or_404(models.Order, user = request.user, id = order_id)
@@ -305,7 +308,7 @@ def payment_success(request, order_id):
 
     # Confirmation message
     messages.success(request, 'Payment Successful!')
-    return render(request,'', {'order' : order})
+    return render(request,'shop/payment_success.html', {'order' : order})
 
 
 def payment_fail(request,order_id):
@@ -314,12 +317,13 @@ def payment_fail(request,order_id):
     order.save()
 
     messages.warning(request, 'Your Payment is cancelled!')
-    return redirect('')
+    return redirect('checkout')
 
 def payment_cancel(request, order_id):
     order = get_object_or_404(models.Order, id = order_id , user = request.user)
     order.status = 'canceled'
     order.save()
+    return redirect('checkout')
 
 
 
