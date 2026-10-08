@@ -146,7 +146,13 @@ LOGOUT_REDIRECT_URL = '/'
 
 MAILERS = {
     'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        
+        'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+        'HOST': 'smtp.gmail.com',
+        'PORT': 587,
+        'USERNAME': 'bishwojitcse.research@gmail.com',
+        'PASSWORD': 'your-app-password',
+        'USE_TLS': True,
     },
 }
 
@@ -160,10 +166,10 @@ SSLCOMMERZ_VALIDATION_URL = 'https://sandbox.sslcommerz.com/validator/api/valida
 # Gmail SETUP
 
 #gmail_send/settings.py
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'bishwojitcse.research@gmail.com'
-EMAIL_HOST_PASSWORD = 'cmat fmhy rzyi eugw' #past the key or password app here
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'bishwojitcse.research@gmail.com'
+# EMAIL_HOST_PASSWORD = 'cmat fmhy rzyi eugw' #past the key or password app here
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
 
