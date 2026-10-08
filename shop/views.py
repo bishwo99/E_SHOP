@@ -89,7 +89,7 @@ def product_detail(request,slug):
     related_products = models.Product.objects.filter(category = product.category).exclude(id = product.id)
 
     user_rating = None
-    if request.user.is_authenticate:
+    if request.user.is_authenticated:
         try:
             user_rating = models.Rating.objects.get(product=product, user = request.user)
         except models.Rating.DoesNotExist:

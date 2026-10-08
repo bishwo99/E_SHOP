@@ -72,7 +72,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                  # `allauth` needs this from django
                 'django.template.context_processors.request',
-                'eshop.context_processor.cart_items_count',
+                'shop.context_processors.cart_items_count',
             ],
         },
     },
