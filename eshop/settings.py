@@ -163,13 +163,5 @@ SSLCOMMERZ_STORE_PASSWORD = 'eshop6aba9c1e9bf13@ssl'
 SSLCOMMERZ_PAYMENT_URL = 'https://sandbox.sslcommerz.com/gwprocess/v4/process.php'
 SSLCOMMERZ_VALIDATION_URL = 'https://sandbox.sslcommerz.com/validator/api/validationserverAPI.php'
 
-# Gmail SETUP
 
-#gmail_send/settings.py
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_USER = 'bishwojitcse.research@gmail.com'
-# EMAIL_HOST_PASSWORD = 'cmat fmhy rzyi eugw' #past the key or password app here
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
 

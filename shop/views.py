@@ -186,7 +186,7 @@ def cart_add(request, product_id):
     except models.CartItem.DoesNotExist:
         cart_item = models.CartItem.objects.create(cart = cart, product = product, quantity = 1)
     messages.success(request, f"{product.name} has been added to your cart")
-    return redirect(request,'product_detail', slug = product.slug)
+    return redirect('product_detail', slug = product.slug)
 
 # Cart Update
 # Cart item quantity increase/decrease korte parbo
