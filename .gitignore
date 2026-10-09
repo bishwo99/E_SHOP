@@ -1,4 +1,6 @@
-eshop_env/ 
-db.sqlite3 
-__pycache__/ 
-.env 
+eshop_env/
+eshop_venv/
+db.sqlite3
+__pycache__/
+.env
+*.py[cod]
