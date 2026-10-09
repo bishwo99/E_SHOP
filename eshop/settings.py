@@ -40,11 +40,18 @@ INSTALLED_APPS = [
     'shop',
     'allauth',
     'allauth.account',
+    'django.contrib.sites',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
 
 ]
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -71,7 +78,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                  # `allauth` needs this from django
-                'django.template.context_processors.request',
                 'shop.context_processors.cart_items_count',
             ],
         },
@@ -132,7 +138,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = 'media'
 
 #Login URL
-LOGIN_URL = ''
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 

@@ -6,6 +6,7 @@ from . import models
 from django.db.models import Max, Min, Avg, Q
 from . import forms
 from . import sslcommerz
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
@@ -18,8 +19,8 @@ def login_view(request):
         user = authenticate(request, username = username, password = password)
 
         if user is not None:
-            login(request,user)
-            redirect('home')
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return redirect('home')
         else:
             messages.error(request, "Invalid username or password")
     return render(request, 'shop/login.html')
@@ -30,16 +31,17 @@ def register_view(request):
 
         if form.is_valid():
             user = form.save()
-            login(request,user)
+            login(request,user,backend='django.contrib.auth.backends.ModelBackend'
+            )
             messages.success(request, "Registration Successfull")
-            redirect('home')
+            return redirect('home')
     else:
         form = RegistrationForm()
     return render(request,'shop/register.html', {'form' : form})
 
 def logout_view(request):
     logout(request)
-    redirect('login')
+    return redirect('login')
 
 # Creating Homepage
 
@@ -106,6 +108,7 @@ def product_detail(request,slug):
     # Rate Product
     # Loged in user can rate the product, Is the user purchased the product or not
 
+@login_required
 def rate_product(request, product_id):
     product = get_object_or_404(models.Product, id = product_id)
     ordered_items = models.OrderItem.objects.filter(
@@ -150,7 +153,7 @@ def rate_product(request, product_id):
 # cart item update - ok
 # checkout - ok
 
-
+@login_required
 def cart_detail(request):
     # Case01: User er cart nai
     # Case02: User er cart ache
@@ -162,7 +165,7 @@ def cart_detail(request):
 
     return render(request,'shop/cart.html', {'cart': cart})
 
-
+@login_required
 def cart_add(request, product_id):
     product = get_object_or_404(models.Product, id = product_id)
     # User er card ache kina
@@ -190,13 +193,13 @@ def cart_add(request, product_id):
 
 # Cart Update
 # Cart item quantity increase/decrease korte parbo
-
+@login_required
 def cart_update(request,product_id):
     # Cart Konta
     # Cart Item konta
     # Product gulo Cart Item e or Stock e available ache kina
     cart = get_object_or_404(models.Cart, user = request.user)
-    product = get_object_or_404(models.Product, product_id)
+    product = get_object_or_404(models.Product, id = product_id)
     cart_item = get_object_or_404(models.CartItem, cart = cart, product = product)
 
     quantity = int(request.POST.get('quantity',1))
@@ -217,11 +220,11 @@ def cart_update(request,product_id):
         messages.success(request, "Cart update succsessfully!")
     return redirect('cart_detail')
 
-
+@login_required
 def cart_remove(request,product_id):
 
     cart = get_object_or_404(models.Cart, user = request.user)
-    product = get_object_or_404(models.Product, product_id)
+    product = get_object_or_404(models.Product, id = product_id)
     cart_item = get_object_or_404(models.CartItem, cart = cart, product = product)
 
     cart_item.delete()
@@ -233,6 +236,7 @@ def cart_remove(request,product_id):
 # For checkout
 # Cart er datagulo niye ashbo
 # Cart empty thakle message dibo
+@login_required
 def checkout(request):
     cart = models.Cart.objects.get(user = request.user)
     try:
@@ -240,7 +244,7 @@ def checkout(request):
             messages.warning(request,'Your cart is empty.')
     except models.Cart.DoesNotExist():
         messages.warning(request,'Your cart is empty.')
-        return redirect(request,'cart_detail')
+        return redirect('cart_detail')
 
     #Checkout Form ta fillup korbe
     if request.method == 'POST':
@@ -274,7 +278,7 @@ def checkout(request):
 #Payment Success
 #Payment Fail
 #Payment Cancel
-
+@login_required
 def payment_process(request):
     order_id = request.session.get('order_id')
 
@@ -288,7 +292,7 @@ def payment_process(request):
     else:
         messages.error(request,'Payment gateway error.')
         return redirect('checkout')
-
+@login_required
 def payment_success(request, order_id):
     order= get_object_or_404(models.Order, user = request.user, id = order_id)
     order.paid = True
@@ -310,7 +314,7 @@ def payment_success(request, order_id):
     messages.success(request, 'Payment Successful!')
     return render(request,'shop/payment_success.html', {'order' : order})
 
-
+@login_required
 def payment_fail(request,order_id):
     order = get_object_or_404(models.Order, id = order_id, user = request.user)
     order.status = 'canceled'
@@ -318,7 +322,7 @@ def payment_fail(request,order_id):
 
     messages.warning(request, 'Your Payment is cancelled!')
     return redirect('checkout')
-
+@login_required
 def payment_cancel(request, order_id):
     order = get_object_or_404(models.Order, id = order_id , user = request.user)
     order.status = 'canceled'

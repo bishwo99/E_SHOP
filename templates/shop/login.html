@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load socialaccount %}
+{% comment %} {% load socialaccount %} {% endcomment %}
 {% block title %}Login | E-Shop{% endblock %}
 
 {% block content %}
@@ -30,12 +30,12 @@
                 
                 <hr class="my-4">
                 
-                <div class="text-center">
+                {% comment %} <div class="text-center">
                     <p>Or sign in with:</p>
                     <a href="{% provider_login_url 'google' next=request.GET.next %}" class="btn btn-outline-danger">
                         <i class="fab fa-google me-2"></i> Google
                     </a>
-                </div>
+                </div> {% endcomment %}
                 
                 <div class="text-center mt-4">
                     <p class="mb-0">Don't have an account? <a href="{% url 'register' %}">Sign up</a></p>
