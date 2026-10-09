@@ -54,7 +54,7 @@ def product_list(request, category_slug = None):  # Slug means, converting eleme
     products = models.Product.objects.all()
 
     if category_slug:
-        category = get_object_or_404(models.Category, category_slug)
+        category = get_object_or_404(models.Category, slug = category_slug)
         products = products.filter(category = category)
 
     min_price = products.aggregate(Min('price'))['price__min']  
