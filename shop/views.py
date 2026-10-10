@@ -254,8 +254,8 @@ def checkout(request):
             order.user = request.user
             order.save() # order kora hoye geche
 
-        for item in cart.item.all():
-            models.OrderItem.create(
+        for item in cart.items.all():
+            models.OrderItem.objects.create(
                 order = order,
                 product = item.product,
                 quantity = item.quantity,
