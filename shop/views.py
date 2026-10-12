@@ -303,7 +303,7 @@ def payment_success(request, order_id):
     order_items = order.order_items.all()
     for item in order_items:
         product = item.prodcut
-        product.stock -= item.quantity
+        product.stock -= item.quantity 
 
         #It means, product ache 20 ta and jodi product 40 ta order kora hoye thake tokhon stock quantity negative hoyte parena ejonne 0 kore dibo
         if product.stock <0:
